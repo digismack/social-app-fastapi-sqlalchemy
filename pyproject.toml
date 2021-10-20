@@ -12,6 +12,7 @@ black = "^21.9b0"
 flake8 = "^4.0.1"
 social-auth-core = "^4.1.0"
 isort = "^5.9.3"
+social-auth-storage-sqlalchemy = "^1.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

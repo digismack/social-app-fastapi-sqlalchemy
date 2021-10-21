@@ -1,6 +1,10 @@
+import asyncio
+
 from social_core.strategy import BaseStrategy, BaseTemplateStrategy
 from social_core.utils import build_absolute_uri
 from starlette.templating import Jinja2Templates
+
+from . import settings
 
 
 class FastAPITemplateStrategy(BaseTemplateStrategy):
@@ -20,19 +24,26 @@ class FastAPIStrategy(BaseStrategy):
         super().__init__(storage, tpl)
 
     def get_setting(self, name):
-        return current_app.config[name]
+        value = getattr(settings, name)
+        print(name, value)
+        # Force text on URL named settings that are instance of Promise
+        # if name.endswith("_URL"):
+        #     if isinstance(value, Promise):
+        #         value = force_str(value)
+        #     value = resolve_url(value)
+        return value
 
-    async def request_data(self, merge=True):
+    def request_data(self, merge=True):
         if not self.request:
             return {}
 
         if merge:
-            data = dict(self.request.params)
-            data.update(dict(await request.form()))
+            data = dict(self.request.query_params)
+            data.update(dict(asyncio.run(self.request.form())))
         elif self.request.method == "POST":
-            data = dict(await request.form())
+            data = dict(asyncio.run(self.request.form()))
         else:
-            data = dict(request.query_params)
+            data = dict(self.request.query_params)
         return data
 
     def request_host(self):

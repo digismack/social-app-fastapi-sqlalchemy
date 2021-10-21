@@ -13,6 +13,7 @@ flake8 = "^4.0.1"
 social-auth-core = "^4.1.0"
 isort = "^5.9.3"
 social-auth-storage-sqlalchemy = "^1.1.0"
+python-multipart = "^0.0.5"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -23,3 +24,20 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 start = "social_app_fastapi_sqlalchemy.main:start"
+
+[tool.black]
+line-length = 119
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''

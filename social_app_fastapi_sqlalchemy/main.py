@@ -16,12 +16,6 @@ app.add_middleware(SessionMiddleware, secret_key="some-random-string")
 @app.get("/", name="root_get")
 @app.post("/", name="root_post")
 async def root(request: Request):
-    # print(dict(request.query_params))
-    # print(dict(await request.form()))
-    # base_url = f"{request.url.scheme}://{request.url.hostname}:{request.url.port}"
-    # print(base_url)
-    print(app.routes)
-
     return {"message": "Hello World"}
 
 

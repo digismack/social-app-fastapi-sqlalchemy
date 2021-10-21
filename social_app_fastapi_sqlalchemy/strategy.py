@@ -1,11 +1,12 @@
 import asyncio
+import json
+import os
 
 from social_core.strategy import BaseStrategy, BaseTemplateStrategy
 from social_core.utils import build_absolute_uri
 from starlette.templating import Jinja2Templates
 
 from . import settings
-
 
 class FastAPITemplateStrategy(BaseTemplateStrategy):
     def render_template(self, tpl, context):
@@ -24,13 +25,16 @@ class FastAPIStrategy(BaseStrategy):
         super().__init__(storage, tpl)
 
     def get_setting(self, name):
-        value = getattr(settings, name)
-        print(name, value)
+        if isinstance(settings, dict):
+            value = settings.get(name)
+        else:
+            value = getattr(settings, name)
+
         # Force text on URL named settings that are instance of Promise
-        # if name.endswith("_URL"):
-        #     if isinstance(value, Promise):
-        #         value = force_str(value)
-        #     value = resolve_url(value)
+        if name.endswith("_URL"):
+            if isinstance(value, Promise):
+                value = force_str(value)
+            value = resolve_url(value)
         return value
 
     def request_data(self, merge=True):

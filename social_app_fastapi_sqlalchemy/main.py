@@ -13,38 +13,39 @@ app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key="some-random-string")
 
 
-@app.get("/")
-@app.post("/")
+@app.get("/", name="root_get")
+@app.post("/", name="root_post")
 async def root(request: Request):
-    print(dict(request.query_params))
-    print(dict(await request.form()))
-    base_url = f"{request.url.scheme}://{request.url.hostname}:{request.url.port}"
-    print(base_url)
+    # print(dict(request.query_params))
+    # print(dict(await request.form()))
+    # base_url = f"{request.url.scheme}://{request.url.hostname}:{request.url.port}"
+    # print(base_url)
+    print(app.routes)
 
     return {"message": "Hello World"}
 
 
-@app.get("/auth/login/{backend}/")
-@app.post("/auth/login/{backend}/")
+@app.get("/auth/login/{backend}/", name="auth_login_get")
+@app.post("/auth/login/{backend}/", name="auth_login_post")
 @psa("complete")
 async def auth_login(backend: str, request: Request):
     return do_auth(backend)
 
 
-@app.get("/auth/complete/{backend}/")
-@app.post("/auth/complete/{backend}/")
+@app.get("/auth/complete/{backend}/", name="auth_complete_get")
+@app.post("/auth/complete/{backend}/", name="auth_complete_post")
 @psa("complete")
 async def auth_complete(backend: str, request: Request):
     return do_complete(backend, login=do_login, request=request, *args, **kwargs)
 
 
-@app.get("/auth/saml_metadata/{backend}/")
+@app.get("/auth/saml_metadata/{backend}/", name="auth_saml_metadata_get")
 def saml_metadata_view(backend: str, request: Request):
-    # complete_url = reverse('complete', args=(backend, ))
+    complete_url = app.url_path_for("auth_complete_get", backend=backend)
 
     strategy = load_strategy(request)
 
-    saml_backend = load_backend(strategy, "social_core.backends.saml.SAMLAuth", redirect_uri="")  # complete_url)
+    saml_backend = load_backend(strategy, "social_core.backends.saml.SAMLAuth", complete_url)
 
     metadata, errors = saml_backend.generate_metadata_xml()
 

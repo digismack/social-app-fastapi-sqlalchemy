@@ -28,21 +28,3 @@ def load_strategy(request):
 def load_backend(strategy, name, redirect_uri):
     Backend = module_member(name)
     return Backend(strategy, redirect_uri)
-
-
-def reverse(route: str, **kwargs) -> URLPath:
-    from app.routers.assignment import router as assign_router
-    from app.routers.game import router as game_router
-    from app.routers.talks import router as talk_router
-    from app.routers.topics import router as topic_router
-
-    ALL_ROUTERS = [assign_router, topic_router, game_router, talk_router]
-
-    for router in ALL_ROUTERS:
-        try:
-            path = router.url_path_for(route, **kwargs)
-            return path
-        except NoMatchFound:
-            pass
-
-    raise Exception(f"No url path could be found for {route}")

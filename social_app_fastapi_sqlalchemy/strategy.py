@@ -8,6 +8,7 @@ from starlette.templating import Jinja2Templates
 
 from . import settings
 
+
 class FastAPITemplateStrategy(BaseTemplateStrategy):
     def render_template(self, tpl, context):
         return render_template(tpl, **context)

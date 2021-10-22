@@ -1,12 +1,11 @@
 import asyncio
-import json
-import os
 
 from social_core.strategy import BaseStrategy, BaseTemplateStrategy
 from social_core.utils import build_absolute_uri
 from starlette.templating import Jinja2Templates
+from fastapi.responses import RedirectResponse
 
-from . import settings
+from . import trivie_settings as settings
 
 
 class FastAPITemplateStrategy(BaseTemplateStrategy):
@@ -30,12 +29,6 @@ class FastAPIStrategy(BaseStrategy):
             value = settings.get(name)
         else:
             value = getattr(settings, name)
-
-        # Force text on URL named settings that are instance of Promise
-        if name.endswith("_URL"):
-            if isinstance(value, Promise):
-                value = force_str(value)
-            value = resolve_url(value)
         return value
 
     def request_data(self, merge=True):
@@ -52,11 +45,25 @@ class FastAPIStrategy(BaseStrategy):
         return data
 
     def request_host(self):
-        if self.request:
-            return f"{self.request.url.scheme}://{self.request.url.hostname}:{self.request.url.port}"
+        return f"{self.request.url.scheme}://{self.request.url.hostname}:{self.request.url.port}"
+
+    def request_is_secure(self):
+        return self.request.url.scheme == "https"
+
+    def request_path(self):
+        return self.request.url
+
+    def request_port(self):
+        return self.request.url.port
+
+    def request_get(self):
+        return dict(self.request.query_params)
+
+    def request_post(self):
+        return dict(asyncio.run(self.request.form()))
 
     def redirect(self, url):
-        return redirect(url)
+        return RedirectResponse(url)
 
     def html(self, content):
         response = make_response(content)
@@ -64,16 +71,16 @@ class FastAPIStrategy(BaseStrategy):
         return response
 
     def session_get(self, name, default=None):
-        return session.get(name, default)
+        return self.session.get(name, default)
 
     def session_set(self, name, value):
-        session[name] = value
+        self.session[name] = value
 
     def session_pop(self, name):
-        return session.pop(name, None)
+        return self.session.pop(name, None)
 
     def session_setdefault(self, name, value):
-        return session.setdefault(name, value)
+        return self.session.setdefault(name, value)
 
     def build_absolute_uri(self, path=None):
         return build_absolute_uri(self.request_host(), path)

@@ -2,3 +2,4 @@
 tests/
 poetry.lock
 *.pyc
+settings.json

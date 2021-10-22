@@ -9,16 +9,10 @@ DEFAULTS = {
 
 
 def do_login(backend, user, social_user):
-    name = backend.strategy.setting("REMEMBER_SESSION_NAME", "keep")
-    remember = (
-        backend.strategy.session_get(name)
-        or request.cookies.get(name)
-        or request.args.get(name)
-        or request.form.get(name)
-        or False
-    )
-
-    return login_user(user, remember=remember)
+    print('do_login backend', backend)
+    print('do_login user', user)
+    print('do_login social_user', social_user)
+    return login_user(user)
 
 
 def load_strategy(request):

@@ -1,11 +1,18 @@
+from collections import namedtuple
 import asyncio
+import json
+import os
 
 from social_core.strategy import BaseStrategy, BaseTemplateStrategy
 from social_core.utils import build_absolute_uri
 from starlette.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 
-from . import trivie_settings as settings
+SETTINGS_FILE = "settings.json"
+
+with open(SETTINGS_FILE) as f:
+    data = json.load(f)
+    settings = namedtuple('settings', data.keys())(*data.values())
 
 
 class FastAPITemplateStrategy(BaseTemplateStrategy):
@@ -45,7 +52,7 @@ class FastAPIStrategy(BaseStrategy):
         return data
 
     def request_host(self):
-        return f"{self.request.url.scheme}://{self.request.url.hostname}:{self.request.url.port}"
+        return f"{self.request.url.hostname}:{self.request.url.port}"
 
     def request_is_secure(self):
         return self.request.url.scheme == "https"
@@ -83,4 +90,7 @@ class FastAPIStrategy(BaseStrategy):
         return self.session.setdefault(name, value)
 
     def build_absolute_uri(self, path=None):
-        return build_absolute_uri(self.request_host(), path)
+        if self.request:
+            return build_absolute_uri(f"{self.request.url.scheme}://{self.request_host()}", path)
+        else:
+            return path

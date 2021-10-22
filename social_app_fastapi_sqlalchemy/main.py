@@ -1,4 +1,5 @@
 import uvicorn
+
 from fastapi import FastAPI, Response
 from social_core.actions import do_auth, do_complete
 from starlette.middleware.sessions import SessionMiddleware
@@ -10,7 +11,6 @@ from .utils import do_login, load_backend, load_strategy
 app = FastAPI()
 
 app.add_middleware(SessionMiddleware, secret_key="some-random-string")
-
 
 @app.get("/", name="root_get")
 @app.post("/", name="root_post")

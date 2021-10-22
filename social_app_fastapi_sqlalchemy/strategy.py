@@ -51,7 +51,7 @@ class FastAPIStrategy(BaseStrategy):
         return self.request.url.scheme == "https"
 
     def request_path(self):
-        return self.request.url
+        return self.request.url.path
 
     def request_port(self):
         return self.request.url.port
